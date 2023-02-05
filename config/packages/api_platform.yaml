@@ -1,7 +1,17 @@
 api_platform:
+    title: 'Truiter REST API'
+    description: 'The Truiter API.'
+    version: 1.0.0
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
+
     patch_formats:
         json: ['application/merge-patch+json']
+
+    formats:
+        html:
+            mime_types: [ 'text/html' ]
     swagger:
         versions: [3]
+
+    metadata_backward_compatibility_layer: false
