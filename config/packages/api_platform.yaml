@@ -8,9 +8,7 @@ api_platform:
     patch_formats:
         json: ['application/merge-patch+json']
 
-    formats:
-        html:
-            mime_types: [ 'text/html' ]
+
     swagger:
         versions: [3]
 
