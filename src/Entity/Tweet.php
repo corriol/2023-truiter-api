@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TweetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,9 +10,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
 #[ApiResource]
+#[ApiFilter(filterClass: SearchFilter::class, properties: ['id'=>'exact', 'text' => 'partial'])]
 class Tweet
 {
     #[ORM\Id]
