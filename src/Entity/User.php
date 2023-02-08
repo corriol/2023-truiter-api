@@ -194,21 +194,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return File|null
-     */
-    public function getImageProfile(): ?File
-    {
-        return $this->imageProfile;
-    }
-
-    /**
-     * @param File|null $imageProfile
-     */
-    public function setImageProfile(?File $imageProfile): void
-    {
-        $this->imageProfile = $imageProfile;
-    }
 
     /**
      * @return string|null
