@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TweetRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -48,6 +49,8 @@ class Tweet
     public function __construct()
     {
         $this->attachments = new ArrayCollection();
+        $this->likeCount = 0;
+        $this->createdAt = new DateTime();
     }
 
     public function getId(): ?int
