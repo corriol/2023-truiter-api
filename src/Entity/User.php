@@ -193,13 +193,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return string|null
      */
-    public function __serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->getId(),
             $this->getUsername(),
             $this->getPassword()
-        ]);    }
+        ];
+    }
 
     /**
      * @param string $data
@@ -207,8 +208,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function __unserialize(array $data): void
     {
-        list( $this->id, $this->username, $this->password) =
-            unserialize($data, ['allowed_classes' => false]);
+        list( $this->id, $this->username, $this->password) = $data;
     }
 
 

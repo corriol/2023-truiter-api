@@ -8,7 +8,6 @@ api_platform:
     patch_formats:
         json: ['application/merge-patch+json']
 
-
     formats:
         json:
             mime_types: [ 'application/json' ]
@@ -17,5 +16,11 @@ api_platform:
 
     swagger:
         versions: [3]
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header
 
     metadata_backward_compatibility_layer: false
+
+
