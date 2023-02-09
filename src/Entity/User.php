@@ -13,6 +13,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 #[ORM\Table(name: '`user`')]
 #[UniqueConstraint(name: 'username', columns:["username"])]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
@@ -26,6 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 15)]
+    #[Groups(["tweet:read"])]
     private ?string $username = null;
 
     #[ORM\Column(length: 50)]

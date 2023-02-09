@@ -11,12 +11,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['tweet:read']],
+    denormalizationContext: ['groups' => ['tweet:write']],
+)]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['id'=>'exact', 'text' => 'partial'])]
 #[ApiFilter(filterClass: DateFilter::class, properties: ['createdAt'])]
 class Tweet
@@ -24,23 +28,28 @@ class Tweet
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tweet:read', 'tweet:write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 280)]
     #[Assert\Length(min: 2, max: 280)]
+    #[Groups(['tweet:read', 'tweet:write'])]
     private ?string $text = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank]
+    #[Groups(['tweet:read'])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column]
     #[Assert\NotBlank]
+    #[Groups(['tweet:read'])]
     private ?int $likeCount = null;
 
     #[ORM\ManyToOne(inversedBy: 'tweets')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank]
+    #[Groups(['tweet:read', 'tweet:write'])]
     private ?User $author = null;
 
     #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: Photo::class)]
