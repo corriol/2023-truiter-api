@@ -53,7 +53,7 @@ class AppFixtures extends Fixture
             $manager->persist($user);
             $users[] = $user;
         }
-        for ($i=0; $i<30; $i++) {
+        for ($i=0; $i<20; $i++) {
             $tweet = new Tweet();
             $tweet->setAuthor($users[rand(0, $totalUsers-1)]);
             $tweet->setText($faker->text(280));

@@ -17,7 +17,7 @@ class TweetsTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertMatchesResourceCollectionJsonSchema(Tweet::class);
 
-        $this->assertCount(30, $response->toArray());
+        $this->assertCount(20, $response->toArray());
 
     }
 
@@ -41,9 +41,9 @@ class TweetsTest extends ApiTestCase
 
         $this->assertJsonContains([
                 'text' => 'Proves',
+                'createdAt' => $dateStr,
                 'author' => '/api/users/1',
-                'attachments' => [],
-                'releaseDate' => $dateStr
+                'likeCount' => 0
         ]);
 
 
