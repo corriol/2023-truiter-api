@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TweetRepository;
@@ -16,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
 #[ApiResource]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['id'=>'exact', 'text' => 'partial'])]
+#[ApiFilter(filterClass: DateFilter::class, properties: ['createdAt'])]
 class Tweet
 {
     #[ORM\Id]
