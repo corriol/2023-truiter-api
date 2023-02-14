@@ -13,9 +13,13 @@ use DateTime;
 class TweetsTest extends ApiTestCase
 {
 
+    // propietat que emmagatzemarà el token en iniciar el test.
+    private string $token;
     protected function setUp(): void
     {
         parent::setUp();
+        $this->token = $this->createToken("user", "user");
+
 
     }
 
@@ -78,8 +82,8 @@ class TweetsTest extends ApiTestCase
         $response = $client->request('POST', '/login', [
             'headers' => ['Content-Type: application/json'],
             'json' => [
-                'username' => 'user',
-                'password' => 'user',
+                'username' => $username,
+                'password' => $password,
             ],
         ]);
 
@@ -91,14 +95,12 @@ class TweetsTest extends ApiTestCase
 
     public function testGetCollectionReturnsValidData(): void
     {
-        $token = $this->createToken('user', 'user');
+
         $client = static::createClient();
-
-
         $response = $client->request('GET', '/api/tweets',
             [
                 "headers" => ["Accept: application/json"],
-                'auth_bearer' => $token
+                'auth_bearer' => $this->token
             ]
         );
 
@@ -110,16 +112,15 @@ class TweetsTest extends ApiTestCase
     }
     public function testPostValidData(): void
     {
-        $token = $this->createToken('user', 'user');
         $client = static::createClient();
 
         $response = $client->request('POST', '/api/tweets',
             [
                 'headers' => ["Accept: application/json"],
-                'auth_bearer' => $token,
+                'auth_bearer' => $this->token,
                 'json' => [
                         'text' => 'Proves',
-                        'author' => '/api/users/1'
+                        'author' => '/api/users/1',
                 ]
             ]
         );
@@ -133,10 +134,8 @@ class TweetsTest extends ApiTestCase
         $this->assertJsonContains([
                 'text' => 'Proves',
                 'createdAt' => $dateStr,
-                'author' => '/api/users/1',
+                'author' => [ "username" => "user"],
                 'likeCount' => 0
         ]);
-
-
     }
 }
