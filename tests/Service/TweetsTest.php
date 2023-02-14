@@ -133,7 +133,7 @@ class TweetsTest extends ApiTestCase
         $this->assertJsonContains([
                 'text' => 'Proves',
                 'createdAt' => $dateStr,
-                'author' => 'user',
+                'author' => '/api/users/1',
                 'likeCount' => 0
         ]);
 
