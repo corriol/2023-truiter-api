@@ -2,13 +2,23 @@
 
 namespace App\Tests\Service;
 
+use ApiPlatform\Symfony\Bundle\Test\Client;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use App\Entity\Tweet;
 use App\Entity\User;
 use DateTime;
 
 class TweetsTest extends ApiTestCase
 {
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+    }
+
     public function testLogin(): void
     {
         $client = self::createClient();
@@ -55,11 +65,41 @@ class TweetsTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    /**
+     * Create a client with a default Authorization header.
+     *
+     * @param string $username
+     * @param string $password     *
+     *
+     */
+    protected function createToken($username = 'user', $password = 'password'): string
+    {
+        $client = static::createClient();
+        $response = $client->request('POST', '/login', [
+            'headers' => ['Content-Type: application/json'],
+            'json' => [
+                'username' => 'user',
+                'password' => 'user',
+            ],
+        ]);
+
+        $data = $response->toArray();
+        //sprintf('Bearer %s', $data['token']));
+        return $data['token'];
+    }
+
+
     public function testGetCollectionReturnsValidData(): void
     {
-        //TODO: Adding authentication
-        $response = static::createClient()->request('GET', '/api/tweets',
-            [ "headers" => ["Accept: application/json"]]
+        $token = $this->createToken('user', 'user');
+        $client = static::createClient();
+
+
+        $response = $client->request('GET', '/api/tweets',
+            [
+                "headers" => ["Accept: application/json"],
+                'auth_bearer' => $token
+            ]
         );
 
         $this->assertResponseIsSuccessful();
@@ -70,10 +110,13 @@ class TweetsTest extends ApiTestCase
     }
     public function testPostValidData(): void
     {
-        // TODO: Adding authentication
-        $response = static::createClient()->request('POST', '/api/tweets',
+        $token = $this->createToken('user', 'user');
+        $client = static::createClient();
+
+        $response = $client->request('POST', '/api/tweets',
             [
                 'headers' => ["Accept: application/json"],
+                'auth_bearer' => $token,
                 'json' => [
                         'text' => 'Proves',
                         'author' => '/api/users/1'
@@ -90,7 +133,7 @@ class TweetsTest extends ApiTestCase
         $this->assertJsonContains([
                 'text' => 'Proves',
                 'createdAt' => $dateStr,
-                'author' => '/api/users/1',
+                'author' => 'user',
                 'likeCount' => 0
         ]);
 
