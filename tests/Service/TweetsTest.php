@@ -15,13 +15,35 @@ class TweetsTest extends ApiTestCase
 
     // propietat que emmagatzemarà el token en iniciar el test.
     private string $token;
+    private Client $client;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->token = $this->createToken("user", "user");
-
-
+        $this->client = static::createClient();
+        $encoder = $this->client->getContainer()->get(JWTEncoderInterface::class);
+        $this->client = static::createClient([], ["auth_bearer"=>$encoder->encode(["username"=>"user", "role"=>["ROLE_USER"]])]);
+        //$this->client = $this->createAuthenticatedClient("user", "user");
     }
+
+    protected function createAuthenticatedClient($username = 'user', $password = 'password'): Client
+    {
+        $client = static::createClient();
+        $response = $client->request('POST', '/login', [
+            'headers' => ['Content-Type: application/json'],
+            'json' => [
+                'username' => $username,
+                'password' => $password,
+            ],
+        ]);
+
+        $data = $response->toArray();
+        //sprintf('Bearer %s', $data['token']));
+
+        return static::createClient([],['auth_bearer'=> $data['token']]);
+    }
+
 
     public function testLogin(): void
     {
@@ -95,12 +117,9 @@ class TweetsTest extends ApiTestCase
 
     public function testGetCollectionReturnsValidData(): void
     {
-
-        $client = static::createClient();
-        $response = $client->request('GET', '/api/tweets',
+        $response = $this->client->request('GET', '/api/tweets',
             [
                 "headers" => ["Accept: application/json"],
-                'auth_bearer' => $this->token
             ]
         );
 
@@ -112,12 +131,9 @@ class TweetsTest extends ApiTestCase
     }
     public function testPostValidData(): void
     {
-        $client = static::createClient();
-
-        $response = $client->request('POST', '/api/tweets',
+        $response = $this->client->request('POST', '/api/tweets',
             [
                 'headers' => ["Accept: application/json"],
-                'auth_bearer' => $this->token,
                 'json' => [
                         'text' => 'Proves',
                         'author' => '/api/users/1',
