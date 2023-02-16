@@ -3,6 +3,7 @@
 namespace App\Tests\Service;
 
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use App\Repository\UserRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -131,12 +132,15 @@ class TweetsTest extends ApiTestCase
     }
     public function testPostValidData(): void
     {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(["username"=>"user"]);
+
         $response = $this->client->request('POST', '/api/tweets',
             [
                 'headers' => ["Accept: application/json"],
                 'json' => [
                         'text' => 'Proves',
-                        'author' => '/api/users/1',
+                        'author' => '/api/users/' . $user->getId(),
                 ]
             ]
         );
