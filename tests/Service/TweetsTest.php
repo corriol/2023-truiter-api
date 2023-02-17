@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use App\Entity\Tweet;
 use App\Entity\User;
 use DateTime;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class TweetsTest extends ApiTestCase
 {
@@ -24,7 +25,7 @@ class TweetsTest extends ApiTestCase
         $this->token = $this->createToken("user", "user");
         $this->client = static::createClient();
         $encoder = $this->client->getContainer()->get(JWTEncoderInterface::class);
-        $this->client = static::createClient([], ["auth_bearer"=>$encoder->encode(["username"=>"user", "role"=>["ROLE_USER"]])]);
+        $this->client = static::createClient([], ["auth_bearer" => $encoder->encode(["username" => "user", "role" => ["ROLE_USER"]])]);
         //$this->client = $this->createAuthenticatedClient("user", "user");
     }
 
@@ -42,7 +43,7 @@ class TweetsTest extends ApiTestCase
         $data = $response->toArray();
         //sprintf('Bearer %s', $data['token']));
 
-        return static::createClient([],['auth_bearer'=> $data['token']]);
+        return static::createClient([], ['auth_bearer' => $data['token']]);
     }
 
 
@@ -96,7 +97,7 @@ class TweetsTest extends ApiTestCase
      * Create a client with a default Authorization header.
      *
      * @param string $username
-     * @param string $password     *
+     * @param string $password *
      *
      */
     protected function createToken($username = 'user', $password = 'password'): string
@@ -130,17 +131,18 @@ class TweetsTest extends ApiTestCase
         $this->assertCount(20, $response->toArray());
 
     }
+
     public function testPostValidData(): void
     {
         $userRepository = static::getContainer()->get(UserRepository::class);
-        $user = $userRepository->findOneBy(["username"=>"user"]);
+        $user = $userRepository->findOneBy(["username" => "user"]);
 
         $response = $this->client->request('POST', '/api/tweets',
             [
                 'headers' => ["Accept: application/json"],
                 'json' => [
-                        'text' => 'Proves',
-                        'author' => '/api/users/' . $user->getId(),
+                    'text' => 'Proves',
+                    'author' => '/api/users/' . $user->getId(),
                 ]
             ]
         );
@@ -152,10 +154,86 @@ class TweetsTest extends ApiTestCase
         $this->assertMatchesResourceItemJsonSchema(Tweet::class);
 
         $this->assertJsonContains([
-                'text' => 'Proves',
-                'createdAt' => $dateStr,
-                'author' => [ "username" => "user"],
-                'likeCount' => 0
+            'text' => 'Proves',
+            'createdAt' => $dateStr,
+            'author' => ["username" => "user"],
+            'likeCount' => 0
         ]);
     }
+
+    public function testPostNoData(): void
+    {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(["username" => "user"]);
+
+        $response = $this->client->request('POST', '/api/tweets',
+            [
+                'headers' => ["Accept: application/json"],
+                'json' => [
+                    //'text' => '',
+                    // 'author' => '',
+                ]
+            ]
+        );
+
+        //dump($response);
+        $date = new DateTime();
+        $dateStr = $date->format('c');
+
+        $this->assertResponseStatusCodeSame(422);
+        //$this->assertMatchesResourceItemJsonSchema(Tweet::class);
+
+        $this->assertJsonContains([
+            'violations' => [
+                [
+                    "propertyPath" => "text",
+                    "message" => "This value should not be blank."
+                ],
+                [
+                    "propertyPath" => "author",
+                    "message" => "This value should not be blank."
+                ]
+
+            ]
+        ]);
+    }
+    public function testPostInvalidData(): void
+    {
+
+        //$this->expectException(UnexpectedValueException::class);
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(["username" => "user"]);
+
+        $response = $this->client->request('POST', '/api/tweets',
+            [
+                'headers' => ["Accept: application/json"],
+                'json' => [
+                    'text' => '1',
+                    'author' => '/api/users/25',
+                ]
+            ]
+        );
+
+        //dump($response);
+        $date = new DateTime();
+        $dateStr = $date->format('c');
+
+        $this->assertResponseStatusCodeSame(400);
+        //$this->assertMatchesResourceItemJsonSchema(Tweet::class);
+
+/*        $this->assertJsonContains([
+            'violations' => [
+                [
+                    "propertyPath" => "text",
+                    "message" => "This value is too short. It should have 2 characters or more."
+                ],
+                [
+                    "propertyPath" => "author",
+                    "message" => "This value should not be blank."
+                ]
+
+            ]
+        ]);*/
+    }
+
 }

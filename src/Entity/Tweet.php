@@ -32,6 +32,7 @@ class Tweet
     private ?int $id = null;
 
     #[ORM\Column(length: 280)]
+    #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 280)]
     #[Groups(['tweet:read', 'tweet:write'])]
     private ?string $text = null;
