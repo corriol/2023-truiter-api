@@ -28,4 +28,26 @@ class UploadMediaTest extends ApiTestCase
             'data' => 'ok',
         ]);
     }
+
+    public function testCreateAMediaObjectFailsIfNoImageIsSent(): void
+    {
+        $file = file_get_contents('resources/photo.jpg');
+        $data = base64_encode("HOLA MÓN");
+
+        $client = self::createClient();
+
+        $client->request('POST', '/media', [
+            'headers' => ['Content-Type' => 'application/json'],
+            'json' => [
+                // If you have additional fields in your MediaObject entity, use the parameters.
+                'filename' => "image",
+                'data' => $data,
+            ]
+        ]);
+        $this->assertResponseIsSuccessful();
+        //$this->assertMatchesResourceItemJsonSchema(MediaObject::class);
+        $this->assertJsonContains([
+            'data' => 'ok',
+        ]);
+    }
 }
